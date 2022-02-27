@@ -90,7 +90,11 @@ public class DefaultPrinterConfiguration implements PrinterConfiguration {
         /**
          * Indentation proprerty
          */
-        INDENTATION(Indentation.class, new Indentation(IndentType.SPACES, 4));
+        INDENTATION(Indentation.class, new Indentation(IndentType.SPACES, 4)),
+        /**
+         * Sets opening braces on new lines for 
+         */
+        OPENING_BRACE_ON_NEWLINE(Boolean.class);
         
         Object defaultValue;
         

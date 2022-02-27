@@ -414,8 +414,13 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
                 }
             }
         }
-
-        printer.println(" {");
+        
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+            printer.print("{");
+        } else {
+            printer.println(" {");
+        }
         printer.indent();
         if (!isNullOrEmpty(n.getMembers())) {
             printMembers(n.getMembers(), arg);
@@ -463,7 +468,12 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
             }
         }
 
-        printer.println(" {");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");  
+            printer.print("{");
+        } else {
+            printer.println(" {");
+        }
         printer.indent();
         if (!isNullOrEmpty(n.getMembers())) {
             printMembers(n.getMembers(), arg);
@@ -1141,6 +1151,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
             }
         }
         printer.print(" ");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+        }
         n.getBody().accept(this, arg);
     }
 
@@ -1168,6 +1181,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
             }
         }
         printer.print(" ");
+        if(getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+        }
         n.getBody().accept(this, arg);
     }
 
@@ -1215,10 +1231,14 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
                 }
             }
         }
+
         if (!n.getBody().isPresent()) {
             printer.print(";");
         } else {
             printer.print(" ");
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
             n.getBody().get().accept(this, arg);
         }
     }
@@ -1325,6 +1345,7 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
     public void visit(final BlockStmt n, final Void arg) {
         printOrphanCommentsBeforeThisChildNode(n);
         printComment(n.getComment(), arg);
+
         printer.println("{");
         if (n.getStatements() != null) {
             printer.indent();
@@ -1378,7 +1399,12 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printComment(n.getComment(), arg);
         printer.print("switch(");
         n.getSelector().accept(this, arg);
-        printer.println(") {");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println(")");
+            printer.println("{");
+        } else {
+            printer.println(") {");
+        }
         if (n.getEntries() != null) {
             indentIf(getOption(ConfigOption.INDENT_CASE_IN_SWITCH).isPresent());
             for (final SwitchEntry e : n.getEntries()) {
@@ -1470,8 +1496,12 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
                 }
             }
         }
-
-        printer.println(" {");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+            printer.print("{");
+        } else {
+            printer.println(" {");
+        }
         printer.indent();
         if (n.getEntries().isNonEmpty()) {
             final boolean alignVertically =
@@ -1516,7 +1546,12 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         }
 
         if (!n.getClassBody().isEmpty()) {
-            printer.println(" {");
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+                printer.print("{");
+            } else {
+                printer.println(" {");
+            }
             printer.indent();
             printMembers(n.getClassBody(), arg);
             printer.unindent();
@@ -1530,6 +1565,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printComment(n.getComment(), arg);
         if (n.isStatic()) {
             printer.print("static ");
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
         }
         n.getBody().accept(this, arg);
     }
@@ -1541,9 +1579,12 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printer.print("if (");
         n.getCondition().accept(this, arg);
         final boolean thenBlock = n.getThenStmt() instanceof BlockStmt;
-        if (thenBlock) // block statement should start on the same line
+        if (thenBlock) { // block statement should start on the same line
             printer.print(") ");
-        else {
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
+        } else {
             printer.println(")");
             printer.indent();
         }
@@ -1564,6 +1605,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
                 printer.indent();
             }
             if (n.getElseStmt().isPresent())
+                if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent() && elseBlock) {
+                    printer.println("");
+                }
                 n.getElseStmt().get().accept(this, arg);
             if (!(elseIf || elseBlock))
                 printer.unindent();
@@ -1577,6 +1621,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printer.print("while (");
         n.getCondition().accept(this, arg);
         printer.print(") ");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");  
+        }
         n.getBody().accept(this, arg);
     }
 
@@ -1594,6 +1641,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printOrphanCommentsBeforeThisChildNode(n);
         printComment(n.getComment(), arg);
         printer.print("do ");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+        }
         n.getBody().accept(this, arg);
         printer.print(" while (");
         n.getCondition().accept(this, arg);
@@ -1609,6 +1659,10 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printer.print(" : ");
         n.getIterable().accept(this, arg);
         printer.print(") ");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+        } 
+
         n.getBody().accept(this, arg);
     }
 
@@ -1641,6 +1695,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
             }
         }
         printer.print(") ");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println(""); 
+        } 
         n.getBody().accept(this, arg);
     }
 
@@ -1687,6 +1744,13 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
                 printer.unindent();
             }
             printer.print(") ");
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
+        } else {
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
         }
         n.getTryBlock().accept(this, arg);
         for (final CatchClause c : n.getCatchClauses()) {
@@ -1694,6 +1758,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         }
         if (n.getFinallyBlock().isPresent()) {
             printer.print(" finally ");
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
             n.getFinallyBlock().get().accept(this, arg);
         }
     }
@@ -1705,6 +1772,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
         printer.print(" catch (");
         n.getParameter().accept(this, arg);
         printer.print(") ");
+        if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+            printer.println("");
+        }
         n.getBody().accept(this, arg);
     }
 
@@ -1845,6 +1915,9 @@ public class DefaultPrettyPrinterVisitor implements VoidVisitor<Void> {
             // Print the expression directly
             ((ExpressionStmt) body).getExpression().accept(this, arg);
         } else {
+            if (getOption(ConfigOption.OPENING_BRACE_ON_NEWLINE).isPresent()) {
+                printer.println("");
+            }
             body.accept(this, arg);
         }
     }
