@@ -513,4 +513,197 @@ class PrettyPrintVisitorTest extends TestParser {
                 "    <html>\n" +
                 "    </html>\"\"\";", cu.getClassByName("X").get().getFieldByName("html").get().toString());
     }
+
+    @Test
+    public void openingBraceOnNewline() {
+        Statement s = parseStatement("if (true) { a = 1; } else if (false) { a = 2; } else { a = 3; }");
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+            .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        String printed = printer.print(s);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+        String expected = "if (true) " + EOL +
+                            "{" + EOL + 
+                            "    a = 1;" + EOL + 
+                            "} else if (false) " + EOL +
+                            "{" + EOL + 
+                            "    a = 2;" + EOL + 
+                            "} else " + EOL +  
+                            "{" + EOL +
+                            "    a = 3;" + EOL + 
+                            "}";
+        assertEquals(expected, printed); // if statements
+
+        Expression e = parseExpression("switch (a) {\n" + 
+            "   case \"1\":\n" + 
+            "       break;\n" + 
+            "   default:\n" + 
+            "       break;\n" + 
+            "}"
+        );
+        printed = printer.print(e);
+        expected = "switch(a)" + EOL +
+        "{" + EOL +   
+        "    case \"1\":" + EOL +  
+        "        break;" + EOL +  
+        "    default:" + EOL +  
+        "        break;" + EOL +  
+        "}";
+        assertEquals(expected, printed); // switch expressions
+
+        e = parseExpression("x -> { return x + 1; }");
+        printed = printer.print(e);
+        expected = "x -> " + EOL + 
+                    "{" + EOL + 
+                    "    return x + 1;" + EOL + 
+                    "}";
+        assertEquals(expected, printed); // lambda expressions
+
+        s = parseStatement("try { a = b; } catch (Exception e) { a(); } finally { a = 1; }");
+        printed = printer.print(s);
+        expected = "try " + EOL + 
+                    "{" + EOL + 
+                    "    a = b;" + EOL +
+                    "} catch (Exception e) " + EOL + 
+                    "{" + EOL +
+                    "    a();" + EOL + 
+                    "} finally " + EOL + 
+                    "{" + EOL +
+                    "    a = 1;" + EOL +
+                    "}";
+        assertEquals(expected, printed); // try statements
+
+        s = parseStatement("try (int a = b) { a(); }");
+        printed = printer.print(s);
+        expected = "try (int a = b) " + EOL + 
+                    "{" + EOL + 
+                    "    a();" + EOL +
+                    "}";
+        assertEquals(expected, printed); // try statements
+        
+        s = parseStatement("do { a(); } while(a == b);");
+        printed = printer.print(s);
+        expected = "do " + EOL +
+                    "{" + EOL +
+                    "    a();" + EOL + 
+                    "} while (a == b);";
+        assertEquals(expected, printed); // do statements
+
+        s = parseStatement("for (int i = 0; i < 10; i++) { f(); }");
+        printed = printer.print(s);
+        expected = "for (int i = 0; i < 10; i++) " + EOL + 
+                    "{" + EOL + 
+                    "    f();" + EOL + 
+                    "}";
+        assertEquals(expected, printed); // for statements
+
+        s = parseStatement("for (String s : list) { f(); }");
+        printed = printer.print(s);
+        expected = "for (String s : list) " + EOL + 
+                    "{" + EOL + 
+                    "    f();" + EOL + 
+                    "}";
+        assertEquals(expected, printed); // for each statements
+
+        s = parseStatement("while (i < 0) { f(); }");
+        printed = printer.print(s);
+        expected = "while (i < 0) " + EOL + 
+                    "{" + EOL +
+                    "    f();" + EOL +
+                    "}";
+        assertEquals(expected, printed); // while statements
+
+        CompilationUnit cu = parseCompilationUnit("enum Hello { A, B, C }");
+        printed = printer.print(cu);
+        expected = "enum Hello" + EOL + 
+                    "{" + EOL + 
+                    "    A, B, C" + EOL + 
+                    "}" + EOL;
+        assertEquals(expected, printed); // enums 
+
+        cu = parseCompilationUnit("enum Hello { A(a), B(a), C(a); Hello(String a) { a = \"1\"; } }");
+        printed = printer.print(cu);
+        expected = "enum Hello" + EOL + 
+                    "{" + EOL + 
+                    "    A(a), B(a), C(a);" + EOL + 
+                    "" + EOL +
+                    "    Hello(String a) " + EOL +
+                    "    {" + EOL +
+                    "        a = \"1\";" + EOL +
+                    "    }" + EOL +
+                    "}" + EOL ;
+
+        assertEquals(expected, printed); // enums 
+
+        cu = parseCompilationUnit("enum Hello { f(1){ void mm() { } }, f(2){ void m() { } } }");
+        printed = printer.print(cu);
+        expected = "enum Hello" + EOL +
+                    "{" + EOL +
+                    "    f(1)" + EOL +
+                    "    {" + EOL +
+                    "        void mm() " + EOL +
+                    "        {" + EOL +
+                    "        }" + EOL +
+                    "    }" + EOL + 
+                    "    , f(2)" + EOL +
+                    "    {" + EOL +
+                    "        void m() " + EOL +
+                    "        {" + EOL +
+                    "        }" + EOL +
+                    "    }" + EOL +
+                    "" + EOL +
+                    "}" + EOL;
+
+        assertEquals(expected, printed); // enums
+
+        cu = parseCompilationUnit("class Hello { public String hello(String a) { return a; } }");
+        printed = printer.print(cu);
+        expected = "class Hello" + EOL +
+                    "{" + EOL +               
+                    "    public String hello(String a) " + EOL +
+                    "    {" + EOL + 
+                    "        return a;" + EOL +
+                    "    }" + EOL +
+                    "}" + EOL;
+
+        assertEquals(expected, printed); // class and method
+
+        cu = parseCompilationUnit("interface Hello extends World { public void f(); }");
+        printed = printer.print(cu);
+        expected = "interface Hello extends World" + EOL + 
+                    "{" + EOL + 
+                    "    public void f();" + EOL + 
+                    "}" + EOL;
+
+        assertEquals(expected, printed); // interface
+
+        cu = parseCompilationUnit("record Hello(String hello) { Hello { a = 1; } }");
+        printed = printer.print(cu);
+        expected = "record Hello(String hello)" + EOL +
+                    "{" + EOL +
+                    "    Hello " + EOL +
+                    "    {" + EOL +
+                    "        a = 1;" + EOL +
+                    "    }" + EOL +
+                    "}" + EOL;
+        
+        assertEquals(expected, printed); // record and compact constructor
+        
+        cu = parseCompilationUnit("class Hello { static { int a = 1; } Hello() { int b = 1; } }");
+        printed = printer.print(cu);
+        expected = "class Hello" + EOL +
+                    "{" + EOL + 
+                    "    static " + EOL +
+                    "    {" + EOL +
+                    "        int a = 1;" + EOL +
+                    "    }" + EOL +
+                    "" + EOL +
+                    "    Hello() " + EOL +
+                    "    {" + EOL +
+                    "        int b = 1;" + EOL +
+                    "    }" + EOL +
+                    "}" + EOL;
+        
+        assertEquals(expected, printed); // static block
+    }
 }
