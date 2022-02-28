@@ -514,126 +514,213 @@ class PrettyPrintVisitorTest extends TestParser {
                 "    </html>\"\"\";", cu.getClassByName("X").get().getFieldByName("html").get().toString());
     }
 
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects if statements
+     */
     @Test
-    public void openingBraceOnNewline() {
-        Statement s = parseStatement("if (true) { a = 1; } else if (false) { a = 2; } else { a = 3; }");
+    public void openingBraceOnNewlineIfStatements() {
         PrinterConfiguration config = new DefaultPrinterConfiguration()
             .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
         DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
-        String printed = printer.print(s);
         final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        Statement s = parseStatement("if (true) { a = 1; } else if (false) { a = 2; } else { a = 3; }");
+        String printed = printer.print(s);
+
         String expected = "if (true) " + EOL +
-                            "{" + EOL + 
-                            "    a = 1;" + EOL + 
-                            "} else if (false) " + EOL +
-                            "{" + EOL + 
-                            "    a = 2;" + EOL + 
-                            "} else " + EOL +  
                             "{" + EOL +
-                            "    a = 3;" + EOL + 
+                            "    a = 1;" + EOL +
+                            "} else if (false) " + EOL +
+                            "{" + EOL +
+                            "    a = 2;" + EOL +
+                            "} else " + EOL +
+                            "{" + EOL +
+                            "    a = 3;" + EOL +
                             "}";
-        assertEquals(expected, printed); // if statements
+        assertEquals(expected, printed);
+    }
 
-        Expression e = parseExpression("switch (a) {\n" + 
-            "   case \"1\":\n" + 
-            "       break;\n" + 
-            "   default:\n" + 
-            "       break;\n" + 
-            "}"
-        );
-        printed = printer.print(e);
-        expected = "switch(a)" + EOL +
-        "{" + EOL +   
-        "    case \"1\":" + EOL +  
-        "        break;" + EOL +  
-        "    default:" + EOL +  
-        "        break;" + EOL +  
-        "}";
-        assertEquals(expected, printed); // switch expressions
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects switch expressions
+     */
+    @Test
+    public void openingBraceOnNewlineSwitchExpressions() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
 
-        e = parseExpression("x -> { return x + 1; }");
-        printed = printer.print(e);
-        expected = "x -> " + EOL + 
-                    "{" + EOL + 
-                    "    return x + 1;" + EOL + 
-                    "}";
-        assertEquals(expected, printed); // lambda expressions
+        Expression e = parseExpression("switch (a) { case \"1\": break; default: break; }");
+        String printed = printer.print(e);
+        String expected = "switch(a)" + EOL +
+                            "{" + EOL +
+                            "    case \"1\":" + EOL +
+                            "        break;" + EOL +
+                            "    default:" + EOL +
+                            "        break;" + EOL +
+                            "}";
+        assertEquals(expected, printed);
+    }
 
-        s = parseStatement("try { a = b; } catch (Exception e) { a(); } finally { a = 1; }");
-        printed = printer.print(s);
-        expected = "try " + EOL + 
-                    "{" + EOL + 
-                    "    a = b;" + EOL +
-                    "} catch (Exception e) " + EOL + 
-                    "{" + EOL +
-                    "    a();" + EOL + 
-                    "} finally " + EOL + 
-                    "{" + EOL +
-                    "    a = 1;" + EOL +
-                    "}";
-        assertEquals(expected, printed); // try statements
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects Lambda expressions
+     */
+    @Test
+    public void openingBraceOnNewlineLambdaExpressions() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        Expression e = parseExpression("x -> { return x + 1; }");
+        String printed = printer.print(e);
+        String expected = "x -> " + EOL +
+                            "{" + EOL +
+                            "    return x + 1;" + EOL +
+                            "}";
+        assertEquals(expected, printed);
+    }
+
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects different types of try statements
+     */
+    @Test
+    public void openingBraceOnNewlineTryStatements() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        Statement s = parseStatement("try { a = b; } catch (Exception e) { a(); } finally { a = 1; }");
+        String printed = printer.print(s);
+        String expected = "try " + EOL +
+                            "{" + EOL +
+                            "    a = b;" + EOL +
+                            "} catch (Exception e) " + EOL +
+                            "{" + EOL +
+                            "    a();" + EOL +
+                            "} finally " + EOL +
+                            "{" + EOL +
+                            "    a = 1;" + EOL +
+                            "}";
+        assertEquals(expected, printed);
 
         s = parseStatement("try (int a = b) { a(); }");
         printed = printer.print(s);
-        expected = "try (int a = b) " + EOL + 
-                    "{" + EOL + 
+        expected = "try (int a = b) " + EOL +
+                    "{" + EOL +
                     "    a();" + EOL +
                     "}";
-        assertEquals(expected, printed); // try statements
-        
-        s = parseStatement("do { a(); } while(a == b);");
-        printed = printer.print(s);
-        expected = "do " + EOL +
-                    "{" + EOL +
-                    "    a();" + EOL + 
-                    "} while (a == b);";
-        assertEquals(expected, printed); // do statements
+        assertEquals(expected, printed);
+    }
 
-        s = parseStatement("for (int i = 0; i < 10; i++) { f(); }");
-        printed = printer.print(s);
-        expected = "for (int i = 0; i < 10; i++) " + EOL + 
-                    "{" + EOL + 
-                    "    f();" + EOL + 
-                    "}";
-        assertEquals(expected, printed); // for statements
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects do statements
+     */
+    @Test
+    public void openingBraceOnNewlineDoStatements() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
 
-        s = parseStatement("for (String s : list) { f(); }");
-        printed = printer.print(s);
-        expected = "for (String s : list) " + EOL + 
-                    "{" + EOL + 
-                    "    f();" + EOL + 
-                    "}";
-        assertEquals(expected, printed); // for each statements
+        Statement s = parseStatement("do { a(); } while(a == b);");
+        String printed = printer.print(s);
+        String expected = "do " + EOL +
+                            "{" + EOL +
+                            "    a();" + EOL +
+                            "} while (a == b);";
+        assertEquals(expected, printed);
+    }
 
-        s = parseStatement("while (i < 0) { f(); }");
-        printed = printer.print(s);
-        expected = "while (i < 0) " + EOL + 
-                    "{" + EOL +
-                    "    f();" + EOL +
-                    "}";
-        assertEquals(expected, printed); // while statements
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects for statements
+     */
+    @Test
+    public void openingBraceOnNewlineForStatements() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        Statement s = parseStatement("for (int i = 0; i < 10; i++) { f(); }");
+        String printed = printer.print(s);
+        String expected = "for (int i = 0; i < 10; i++) " + EOL +
+                            "{" + EOL +
+                            "    f();" + EOL +
+                            "}";
+        assertEquals(expected, printed);
+    }
+
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects for-each statements
+     */
+    @Test
+    public void openingBraceOnNewlineForEachStatements() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        Statement s = parseStatement("for (String s : list) { f(); }");
+        String printed = printer.print(s);
+        String expected = "for (String s : list) " + EOL +
+                            "{" + EOL +
+                            "    f();" + EOL +
+                            "}";
+        assertEquals(expected, printed);
+    }
+
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects while statements
+     */
+    @Test
+    public void openingBraceOnNewlineWhileStatements() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        Statement s = parseStatement("while (i < 0) { f(); }");
+        String printed = printer.print(s);
+        String expected = "while (i < 0) " + EOL +
+                            "{" + EOL +
+                            "    f();" + EOL +
+                            "}";
+        assertEquals(expected, printed);
+    }
+
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects different types of enum declarations
+     */
+    @Test
+    public void openingBraceOnNewlineEnums() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
 
         CompilationUnit cu = parseCompilationUnit("enum Hello { A, B, C }");
-        printed = printer.print(cu);
-        expected = "enum Hello" + EOL + 
-                    "{" + EOL + 
-                    "    A, B, C" + EOL + 
-                    "}" + EOL;
-        assertEquals(expected, printed); // enums 
+        String printed = printer.print(cu);
+        String expected = "enum Hello" + EOL +
+                            "{" + EOL +
+                            "    A, B, C" + EOL +
+                            "}" + EOL;
+        assertEquals(expected, printed);
 
         cu = parseCompilationUnit("enum Hello { A(a), B(a), C(a); Hello(String a) { a = \"1\"; } }");
         printed = printer.print(cu);
-        expected = "enum Hello" + EOL + 
-                    "{" + EOL + 
-                    "    A(a), B(a), C(a);" + EOL + 
+        expected = "enum Hello" + EOL +
+                    "{" + EOL +
+                    "    A(a), B(a), C(a);" + EOL +
                     "" + EOL +
                     "    Hello(String a) " + EOL +
                     "    {" + EOL +
                     "        a = \"1\";" + EOL +
                     "    }" + EOL +
-                    "}" + EOL ;
+                    "}" + EOL;
 
-        assertEquals(expected, printed); // enums 
+        assertEquals(expected, printed);
 
         cu = parseCompilationUnit("enum Hello { f(1){ void mm() { } }, f(2){ void m() { } } }");
         printed = printer.print(cu);
@@ -644,7 +731,7 @@ class PrettyPrintVisitorTest extends TestParser {
                     "        void mm() " + EOL +
                     "        {" + EOL +
                     "        }" + EOL +
-                    "    }" + EOL + 
+                    "    }" + EOL +
                     "    , f(2)" + EOL +
                     "    {" + EOL +
                     "        void m() " + EOL +
@@ -654,56 +741,100 @@ class PrettyPrintVisitorTest extends TestParser {
                     "" + EOL +
                     "}" + EOL;
 
-        assertEquals(expected, printed); // enums
+        assertEquals(expected, printed);
+    }
 
-        cu = parseCompilationUnit("class Hello { public String hello(String a) { return a; } }");
-        printed = printer.print(cu);
-        expected = "class Hello" + EOL +
-                    "{" + EOL +               
-                    "    public String hello(String a) " + EOL +
-                    "    {" + EOL + 
-                    "        return a;" + EOL +
-                    "    }" + EOL +
-                    "}" + EOL;
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects class and method declarations
+     */
+    @Test
+    public void openingBraceOnNewlineClassAndMethodDeclarations() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
 
-        assertEquals(expected, printed); // class and method
+        CompilationUnit cu = parseCompilationUnit("class Hello { public String hello(String a) { return a; } }");
+        String printed = printer.print(cu);
+        String expected = "class Hello" + EOL +
+                            "{" + EOL +
+                            "    public String hello(String a) " + EOL +
+                            "    {" + EOL +
+                            "        return a;" + EOL +
+                            "    }" + EOL +
+                            "}" + EOL;
 
-        cu = parseCompilationUnit("interface Hello extends World { public void f(); }");
-        printed = printer.print(cu);
-        expected = "interface Hello extends World" + EOL + 
-                    "{" + EOL + 
-                    "    public void f();" + EOL + 
-                    "}" + EOL;
+        assertEquals(expected, printed);
+    }
 
-        assertEquals(expected, printed); // interface
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects interface declarations
+     */
+    @Test
+    public void openingBraceOnNewlineInterfaceDeclarations() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
 
-        cu = parseCompilationUnit("record Hello(String hello) { Hello { a = 1; } }");
-        printed = printer.print(cu);
-        expected = "record Hello(String hello)" + EOL +
-                    "{" + EOL +
-                    "    Hello " + EOL +
-                    "    {" + EOL +
-                    "        a = 1;" + EOL +
-                    "    }" + EOL +
-                    "}" + EOL;
+        CompilationUnit cu = parseCompilationUnit("interface Hello extends World { public void f(); }");
+        String printed = printer.print(cu);
+        String expected = "interface Hello extends World" + EOL +
+                            "{" + EOL +
+                            "    public void f();" + EOL +
+                            "}" + EOL;
+
+        assertEquals(expected, printed);
+    }
+
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects record declarations
+     */
+    @Test
+    public void openingBraceOnNewlineRecordDeclarations() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        CompilationUnit cu = parseCompilationUnit("record Hello(String hello) { Hello { int a = 1; } }");
+        String printed = printer.print(cu);
+        String expected = "record Hello(String hello)" + EOL +
+                            "{" + EOL +
+                            "    Hello " + EOL +
+                            "    {" + EOL +
+                            "        int a = 1;" + EOL +
+                            "    }" + EOL +
+                            "}" + EOL;
+
+        assertEquals(expected, printed);
+    }
+
+    /**
+     * Tests that the PrettyPrinter config option OPENING_BRACE_ON_NEWLINE affects static blocks
+     */
+    @Test
+    public void openingBraceOnNewlineStaticBlocks() {
+        PrinterConfiguration config = new DefaultPrinterConfiguration()
+                .addOption(new DefaultConfigurationOption(ConfigOption.OPENING_BRACE_ON_NEWLINE));
+        DefaultPrettyPrinter printer = new DefaultPrettyPrinter(config);
+        final String EOL = getOption(config, ConfigOption.END_OF_LINE_CHARACTER).get().asValue();
+
+        CompilationUnit cu = parseCompilationUnit("class Hello { static { int a = 1; } Hello() { int b = 1; } }");
+        String printed = printer.print(cu);
+        String expected = "class Hello" + EOL +
+                            "{" + EOL +
+                            "    static " + EOL +
+                            "    {" + EOL +
+                            "        int a = 1;" + EOL +
+                            "    }" + EOL +
+                            "" + EOL +
+                            "    Hello() " + EOL +
+                            "    {" + EOL +
+                            "        int b = 1;" + EOL +
+                            "    }" + EOL +
+                            "}" + EOL;
         
-        assertEquals(expected, printed); // record and compact constructor
-        
-        cu = parseCompilationUnit("class Hello { static { int a = 1; } Hello() { int b = 1; } }");
-        printed = printer.print(cu);
-        expected = "class Hello" + EOL +
-                    "{" + EOL + 
-                    "    static " + EOL +
-                    "    {" + EOL +
-                    "        int a = 1;" + EOL +
-                    "    }" + EOL +
-                    "" + EOL +
-                    "    Hello() " + EOL +
-                    "    {" + EOL +
-                    "        int b = 1;" + EOL +
-                    "    }" + EOL +
-                    "}" + EOL;
-        
-        assertEquals(expected, printed); // static block
+        assertEquals(expected, printed);
     }
 }
