@@ -149,17 +149,12 @@ public class Position implements Comparable<Position> {
 
     public boolean isAfter(Position otherPosition) {
         assertNotNull(otherPosition);
-        if (otherPosition.line == Position.ABSOLUTE_BEGIN_LINE) {
-            // FIXME: What if both positions are on the same line but different columns..?
-            return true;
-        }
         if (line > otherPosition.line) {
             return true;
         } else if (line == otherPosition.line) {
             return column > otherPosition.column;
         }
         return false;
-
     }
 
     public boolean isAfterOrEqual(Position otherPosition) {
