@@ -133,18 +133,21 @@ public class Position implements Comparable<Position> {
 
     /**
      * @return If this position is valid, this.
-     *   Otherwise, if the alternativePosition is valid, return that.
-     *   Otherwise otherwise, just return this.
+     * Otherwise, if the alternativePosition is valid, return that.
+     * Otherwise, if both positions are invalid, just return this.
      *   TODO: Simplify/clarify.
      */
     public Position orIfInvalid(Position alternativePosition) {
         assertNotNull(alternativePosition);
         // TODO: Why the || ?
         //  ... It seems that if both this and the alternative are invalid, then we return this..?
-        if (valid() || alternativePosition.invalid()) {
+        if (valid()) {
+            return this;
+        } else if (alternativePosition.valid()) {
+            return alternativePosition;
+        } else {
             return this;
         }
-        return alternativePosition;
     }
 
     public boolean isAfter(Position otherPosition) {
