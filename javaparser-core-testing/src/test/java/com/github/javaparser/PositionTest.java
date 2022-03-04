@@ -45,4 +45,28 @@ public class PositionTest {
         Position actualPosition = thisPosition.orIfInvalid(otherPosition);
         assertEquals(otherPosition, actualPosition);
     }
+
+    @Test
+    void testIsAfterReturnsTrueIfThisPositionIsAfterOtherPosition() {
+        Position thisPosition = new Position(1, 5);
+        Position otherPosition = new Position(1, 4);
+        boolean isAfter = thisPosition.isAfter(otherPosition);
+        assertTrue(isAfter);
+    }
+
+    @Test
+    void testIsAfterReturnsFalseIfThisPositionIsNotAfterOtherPosition() {
+        Position thisPosition = new Position(1, 4);
+        Position otherPosition = new Position(1, 5);
+        boolean isAfter = thisPosition.isAfter(otherPosition);
+        assertFalse(isAfter);
+    }
+
+    @Test
+    void testIsAfterReturnsFalseIfThisPositionIsEqualToOtherPosition() {
+        Position thisPosition = new Position(1, 5);
+        Position otherPosition = new Position(1, 5);
+        boolean isAfter = thisPosition.isAfter(otherPosition);
+        assertFalse(isAfter);
+    }
 }
