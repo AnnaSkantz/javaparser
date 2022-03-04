@@ -132,7 +132,7 @@ public class Position implements Comparable<Position> {
     }
 
     /**
-     * @return If this position is valid, this.
+     * @return If this position is valid, return this.
      * Otherwise, if the alternativePosition is valid, return that.
      * Otherwise, if both positions are invalid, return the alternative position.
      */
