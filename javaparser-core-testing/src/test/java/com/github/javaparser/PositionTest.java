@@ -37,6 +37,20 @@ public class PositionTest {
     }
 
     @Test
+    void testInvalidShouldReturnTrue(){
+        Position position = new Position(0, 0);
+        boolean invalid = position.invalid();
+        assertTrue(invalid);
+    }
+
+    @Test
+    void testInvalidShouldReturnFalse(){
+        Position position = new Position(2, 2);
+        boolean invalid = position.invalid();
+        assertFalse(invalid);
+    }
+
+    @Test
     void testOrIsInvalidReturnsThisPositionWhenItsValid()  {
         Position thisPosition = new Position(3, 5);
         Position otherPosition = new Position(6, 5);
