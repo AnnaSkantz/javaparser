@@ -7,6 +7,28 @@ import org.junit.jupiter.api.Test;
 public class PositionTest {
 
     @Test
+    void testPositionThrowsExceptionForLine() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Position(-3, 3);
+        });
+        int line = -3;
+        String expectedMessage = "Can't position at line " + line;
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void testPositionThrowsExceptionForColumn() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new Position(1, -2);
+        });
+        int column = -2;
+        String expectedMessage = "Can't position at column " + column;
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void testWithLineWhenPositionIsCorrect()  {
         Position actualPosition = new Position(3, 5);
         Position expectedPosition = new Position(6, 5);
