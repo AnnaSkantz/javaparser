@@ -69,4 +69,28 @@ public class PositionTest {
         boolean isAfter = thisPosition.isAfter(otherPosition);
         assertFalse(isAfter);
     }
+
+    @Test
+    void testIsBeforeReturnsTrueIfThisPositionIsBeforeOtherPosition() {
+        Position thisPosition = new Position(1, 4);
+        Position otherPosition = new Position(1, 5);
+        boolean isBefore = thisPosition.isBefore(otherPosition);
+        assertTrue(isBefore);
+    }
+
+    @Test
+    void testIsBeforeReturnsFalseIfThisPositionIsNotBeforeOtherPosition() {
+        Position thisPosition = new Position(1, 5);
+        Position otherPosition = new Position(1, 4);
+        boolean isBefore = thisPosition.isBefore(otherPosition);
+        assertFalse(isBefore);
+    }
+
+    @Test
+    void testIsBeforeReturnsFalseIfThisPositionIsEqualToOtherPosition() {
+        Position thisPosition = new Position(1, 5);
+        Position otherPosition = new Position(1, 5);
+        boolean isBefore = thisPosition.isBefore(otherPosition);
+        assertFalse(isBefore);
+    }
 }
