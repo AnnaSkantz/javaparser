@@ -23,6 +23,20 @@ public class PositionTest {
     }
 
     @Test
+    void testValidReturnsFalseWithUnacceptedColumn() {
+        Position position = new Position(2, 0);
+        boolean valid = position.valid();
+        assertFalse(valid);
+    }
+
+    @Test
+    void testValidReturnsFalseWithUnacceptableLineAndColumn(){
+        Position position = new Position(0, 0);
+        boolean valid = position.valid();
+        assertFalse(valid);
+    }
+
+    @Test
     void testOrIsInvalidReturnsThisPositionWhenItsValid()  {
         Position thisPosition = new Position(3, 5);
         Position otherPosition = new Position(6, 5);
